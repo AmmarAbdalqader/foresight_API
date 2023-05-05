@@ -1,15 +1,33 @@
 const User = require("../models/user.model");
 
-exports.getUser = (req, res) => {
-    User.getUser(req, (err, data) => {
+exports.signin = (req, res) => {
+    User.signin(req.body, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
-          return res.status(404).send({
-            message: `Not found User with username = ${req.username} && password = ${req.password}.`
+          return res.status(444).send({
+            message: `Not found User with username = ${req.body.username} && password = ${req.body.password}.`
           });
         } else {
             return res.status(500).send({
-            message: "Error retrieving User with username " + req.username
+            message: "Error retrieving User with username " + req.body.username
+          });
+        }
+      } 
+      
+      return res.send(data);
+    });
+  };
+
+exports.getUserById = (req, res) => {
+    User.getUserById(req.params, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(404).send({
+            message: `Not found User with id = ${req.id}.`
+          });
+        } else {
+            return res.status(500).send({
+            message: "Error retrieving User with id " + req.id
           });
         }
       } else{
@@ -19,7 +37,8 @@ exports.getUser = (req, res) => {
   };
 
 exports.addUser = (req, res) => {
-    User.addUser(req, (err, data) => {
+    User.addUser(req.body, (err, data) => {
+      
       if (err) {
         if (err.kind === "not_found") {
           return res.status(404).send({

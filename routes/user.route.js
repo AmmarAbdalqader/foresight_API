@@ -1,14 +1,10 @@
 const router = require("express").Router();
 const user = require("../controllers/user.contorller");
 
-router.get('/:username/:password',(req, res) =>{ 
-    user.getUser(req.params, res);
-});
+router.post('/signin', user.signin);
 
-router.post('/addUser',(req, res) =>{
-  user.addUser(req.body, res);
-});
+router.get('/get/:id', user.getUserById);
 
-
+router.post('/addUser', user.addUser);
 
 module.exports = router;
