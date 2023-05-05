@@ -8,7 +8,7 @@ const User = function(user){
 };
 
 User.signin = (user, result) => {
-    conn.query(`SELECT * FROM users WHERE username = ? and password = ?`,
+    conn.query(`SELECT * FROM users WHERE username = ? and password = ? and Active = 1`,
      [user.username, user.password],
       (err, res) =>{
         if(err){
