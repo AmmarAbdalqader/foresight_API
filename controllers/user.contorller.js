@@ -55,3 +55,22 @@ exports.addUser = (req, res) => {
     });
   };
 
+exports.editUser = (req, res) => {
+    User.editUser(req.body, (err, data) => {
+      
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(404).send({
+            message: `Cannot edit User ${req.Username}.`
+          });
+        } else {
+            return res.status(500).send({
+            message: " Username already in use " + req.Username
+          });
+        }
+      } else{
+        return res.send(data);
+      } 
+    });
+  };
+

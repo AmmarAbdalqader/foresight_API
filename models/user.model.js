@@ -1,6 +1,6 @@
 const conn = require("../services/db");
 
-const User = function(user){
+const User = function (user) {
     this.ID = user.ID;
     this.Name = user.Name;
     this.Username = user.Username;
@@ -9,25 +9,25 @@ const User = function(user){
 
 User.signin = (user, result) => {
     conn.query(`SELECT * FROM users WHERE username = ? and password = ? and Active = 1`,
-     [user.username, user.password],
-      (err, res) =>{
-        if(err){
-            console.log("error: ", err);
-            result(err, null);
-            return;
-        }
-        if (res.length) {
-            console.log("found user: ", res[0]);
-            result(null, res[0]);
-            return;
-        }
-        result({ kind: "not_found" }, null);
-    });
-}; 
+        [user.username, user.password],
+        (err, res) => {
+            if (err) {
+                console.log("error: ", err);
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                console.log("found user: ", res[0]);
+                result(null, res[0]);
+                return;
+            }
+            result({ kind: "not_found" }, null);
+        });
+};
 
 User.getUserById = (user, result) => {
-    conn.query(`SELECT * FROM users WHERE id = ?`, [user.id], (err, res) =>{
-        if(err){
+    conn.query(`SELECT * FROM users WHERE id = ?`, [user.id], (err, res) => {
+        if (err) {
             console.log("error: ", err);
             result(err, null);
             return;
@@ -39,11 +39,11 @@ User.getUserById = (user, result) => {
         }
         result({ kind: "not_found" }, null);
     });
-}; 
+};
 
-User.addUser = (user, result)  => {
-    conn.query(`SELECT * FROM users WHERE username = ?`, user.Username, (err, res) =>{
-        if(err){
+User.addUser = (user, result) => {
+    conn.query(`SELECT * FROM users WHERE username = ?`, user.Username, (err, res) => {
+        if (err) {
             result(err, null);
             return;
         }
@@ -51,8 +51,8 @@ User.addUser = (user, result)  => {
             result("existing", null);
             return;
         }
-        
-        conn.query(`INSERT INTO users SET ?`, user, (err, res) =>{
+
+        conn.query(`INSERT INTO users SET ?`, user, (err, res) => {
             if (err) {
                 console.log("error: ", err);
                 result(err, null);
@@ -62,7 +62,24 @@ User.addUser = (user, result)  => {
             result(null, { id: res.insertId, ...user });
         });
     });
-}; 
+};
+
+User.editUser = (user, result) => {
+    conn.query(
+        `UPDATE users SET Name = ?, Password = ?, Email = ? WHERE ID = ?`,
+        [user.Name, user.Password, user.Email, user.ID],
+        (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                result(null, {"message" : "Done"});
+                return;
+            }
+            return;
+        });
+};
 
 module.exports = User;
 
