@@ -44,9 +44,13 @@ exports.addUser = (req, res) => {
           return res.status(404).send({
             message: `Cannot add User ${req.Username}.`
           });
-        } else {
-            return res.status(500).send({
+        } else if(err.kind === "existing") {
+            return res.status(555).send({
             message: " Username already in use " + req.Username
+          });
+        } else {
+          return res.status(500).send({
+            message: " Error "
           });
         }
       } else{
@@ -74,3 +78,20 @@ exports.editUser = (req, res) => {
     });
   };
 
+  exports.getAllUsers = (req, res) => {
+    User.getAllUsers((err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(404).send({
+            message: `Not found Users.`
+          });
+        } else {
+            return res.status(500).send({
+            message: "Error retrieving All Users."
+          });
+        }
+      } else{
+        return res.send(data);
+      } 
+    });
+  };

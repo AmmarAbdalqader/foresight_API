@@ -48,19 +48,22 @@ User.addUser = (user, result) => {
             return;
         }
         if (res.length) {
-            result("existing", null);
+            result({ kind: "existing" }, null);
             return;
         }
 
-        conn.query(`INSERT INTO users SET ?`, user, (err, res) => {
-            if (err) {
-                console.log("error: ", err);
-                result(err, null);
-                return;
-            }
-            console.log("User created : ", { id: res.insertId, ...user });
-            result(null, { id: res.insertId, ...user });
-        });
+        conn.query(
+            `INSERT INTO users SET Name = ?, Username = ?, Password = ?, Photo = ?, SignUpDate = ?, Email = ?, Active = ?, Teacher = ?`,
+            [user.Name, user.Username, user.Password, user.Photo, new Date(), user.Email, 1, 0],
+            (err, res) => {
+                if (err) {
+                    console.log("error: ", err);
+                    result(err, null);
+                    return;
+                }
+                console.log("User created : ", { id: res.insertId, ...user });
+                result(null, { id: res.insertId, ...user });
+            });
     });
 };
 
@@ -74,10 +77,27 @@ User.editUser = (user, result) => {
                 return;
             }
             if (res.length) {
-                result(null, {"message" : "Done"});
+                result(null, { "message": "Done" });
                 return;
             }
             return;
+        });
+};
+
+User.getAllUsers = (result) => {
+    conn.query(`SELECT * FROM users`,
+        (err, res) => {
+            if (err) {
+                console.log("error: ", err);
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                console.log("found user: ", res);
+                result(null, res);
+                return;
+            }
+            result({ kind: "not_found" }, null);
         });
 };
 
