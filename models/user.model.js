@@ -1,4 +1,6 @@
 const conn = require("../services/db");
+const util = require('util');
+const query = util.promisify(conn.query).bind(conn);
 
 const User = function (user) {
     this.ID = user.ID;
@@ -7,10 +9,10 @@ const User = function (user) {
     this.Password = user.Password;
 };
 
-User.signin = (user, result) => {
-    conn.query(`SELECT * FROM users WHERE username = ? and password = ? and Active = 1`,
+User.signin = async (user, result) => {
+    await query(`SELECT * FROM users WHERE username = ? and password = ? and Active = 1`,
         [user.username, user.password],
-        (err, res) => {
+        async (err, res) => {
             if (err) {
                 console.log("error: ", err);
                 result(err, null);
@@ -18,6 +20,7 @@ User.signin = (user, result) => {
             }
             if (res.length) {
                 console.log("found user: ", res[0]);
+                await query(`UPDATE users SET Token = ? WHERE ID = ?`, [user.token, res[0].ID]);
                 result(null, res[0]);
                 return;
             }
@@ -26,7 +29,7 @@ User.signin = (user, result) => {
 };
 
 User.getUserById = (user, result) => {
-    conn.query(`SELECT * FROM users WHERE id = ?`, [user.id], (err, res) => {
+    query(`SELECT * FROM users WHERE id = ?`, [user.id], (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);
@@ -42,7 +45,7 @@ User.getUserById = (user, result) => {
 };
 
 User.addUser = (user, result) => {
-    conn.query(`SELECT * FROM users WHERE username = ?`, user.Username, (err, res) => {
+    query(`SELECT * FROM users WHERE username = ?`, user.Username, (err, res) => {
         if (err) {
             result(err, null);
             return;
@@ -52,7 +55,7 @@ User.addUser = (user, result) => {
             return;
         }
 
-        conn.query(
+        query(
             `INSERT INTO users SET Name = ?, Username = ?, Password = ?, Photo = ?, SignUpDate = ?, Email = ?, Active = ?, Teacher = ?`,
             [user.Name, user.Username, user.Password, user.Photo, new Date(), user.Email, 1, 0],
             (err, res) => {
@@ -68,7 +71,7 @@ User.addUser = (user, result) => {
 };
 
 User.editUser = (user, result) => {
-    conn.query(
+    query(
         `UPDATE users SET Name = ?, Password = ?, Email = ? WHERE ID = ?`,
         [user.Name, user.Password, user.Email, user.ID],
         (err, res) => {
@@ -85,7 +88,7 @@ User.editUser = (user, result) => {
 };
 
 User.getAllUsers = (result) => {
-    conn.query(`SELECT * FROM users`,
+    query(`SELECT * FROM users`,
         (err, res) => {
             if (err) {
                 console.log("error: ", err);

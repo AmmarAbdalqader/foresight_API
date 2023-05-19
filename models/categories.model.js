@@ -1,4 +1,6 @@
 const conn = require("../services/db");
+const util = require('util');
+const query = util.promisify(conn.query).bind(conn);
 
 const Categories = function (user) {
     this.ID = user.ID;
@@ -7,7 +9,7 @@ const Categories = function (user) {
     this.Icon = user.Icon;
 };
 Categories.getCategories = (ID, result) => {
-    conn.query(
+    query(
         `SELECT * FROM categories ${ID != 0 ? " WHERE id = ?" : ""}`,
         [ID],
         (err, res) => {
@@ -27,7 +29,7 @@ Categories.getCategories = (ID, result) => {
 
 
 Categories.getCategoriesSub = (categoryID, result) => {
-    conn.query(
+    query(
         `SELECT * FROM categories_sub ${categoryID != 0 ? " WHERE CategoryID = ?" : ""}`,
         [categoryID],
         (err, res) => {
