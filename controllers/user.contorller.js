@@ -95,3 +95,23 @@ exports.editUser = (req, res) => {
       } 
     });
   };
+
+
+
+  exports.changePassword = (req, res) => {
+    User.changePassword(req.body, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(444).send({
+            message: `Cannot change user = ${req.body.userID} newPassword = ${req.body.newPassword}.`
+          });
+        } else {
+            return res.status(500).send({
+            message: "Error changing User Password with " + req.body.username
+          });
+        }
+      } 
+      
+      return res.send(data);
+    });
+  };

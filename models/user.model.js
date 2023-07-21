@@ -104,5 +104,29 @@ User.getAllUsers = (result) => {
         });
 };
 
-module.exports = User;
 
+User.changePassword = async (user, result) => {
+    var resss = await query("SELECT Password FROM users WHERE ID = ?", [user.userID]);
+    if (resss[0].Password == user.oldPassword) {
+        await query(`UPDATE users SET password = ? WHERE ID = ?`,
+            [user.newPassword, user.userID],
+            (err, res) => {
+                if (err) {
+                    console.log("error: ", err);
+                    result(err, null);
+                    return;
+                }
+                if (res.affectedRows) {
+                    result(null, { "message": "OK" });
+                    return;
+                }
+                result({ kind: "not_found" }, null);
+            });
+    } else {
+        result(null, { "message": "WrongPassword" });
+    }
+};
+
+
+
+module.exports = User;
